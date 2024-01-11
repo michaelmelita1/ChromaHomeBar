@@ -1,80 +1,18 @@
 #import <QuartzCore/QuartzCore.h>
-#import "libcolorpicker.h"
-#define chromahomebarxPrefs @"/var/mobile/Library/Preferences/com.afnanahmad.chromahomebarxpref.plist"
 
 static NSUInteger totalColors = 2;
 
 
 static NSMutableDictionary *settings;
-BOOL enabled = NO;
+BOOL enabled = YES;
 NSString *style = @"Wave";
 UIColor *firstColor = [UIColor blueColor];
 UIColor *secondColor = [UIColor redColor];
 
-UIColor *breathingColor = [UIColor blueColor];
-UIColor *staticColor = [UIColor blueColor];
 CGFloat waveSpeed = 0.05;
 CGFloat waveOpacity = 1;
-CGFloat specturmSpeed = 0.1;
-CGFloat specturmOpacity = 1;
 CGFloat homeBarOpacity = 1;
-CGFloat breathingSpeed = 10.0;
-CGFloat fadeSpeed = 10.0;
 NSString *waveDirection = @"l2r";
-
-void refreshPrefs() {
-    NSString *fade1FallbackHex = @"#F62459";
-    NSString *fade2FallbackHex = @"#BF55EC";
-    NSString *breathingFallbackHex = @"#2ABB9B";
-    NSString *staticFallbackHex = @"#F62459";
-
-    settings = nil;
-    settings = [[NSMutableDictionary alloc] initWithContentsOfFile:[chromahomebarxPrefs stringByExpandingTildeInPath]];
-    if([settings objectForKey:@"enabled"])enabled = [[settings objectForKey:@"enabled"] boolValue];
-    if([settings objectForKey:@"style"])style = [[settings objectForKey:@"style"] stringValue];
-    if([settings objectForKey:@"fadeColor1"]){
-        firstColor = LCPParseColorString([[settings objectForKey:@"fadeColor1"] stringValue], fade1FallbackHex);
-    } else
-    {
-        firstColor = LCPParseColorString(fade1FallbackHex, fade1FallbackHex);
-    }
-
-    if([settings objectForKey:@"fadeColor2"]){
-        secondColor = LCPParseColorString([[settings objectForKey:@"fadeColor2"] stringValue], fade2FallbackHex);
-    } else
-    {
-        secondColor = LCPParseColorString(fade2FallbackHex, fade2FallbackHex);
-    }
-
-    if([settings objectForKey:@"breathingColor"]){breathingColor = LCPParseColorString([[settings objectForKey:@"breathingColor"] stringValue], breathingFallbackHex);
-
-    } else
-    {
-        breathingColor = LCPParseColorString(breathingFallbackHex, breathingFallbackHex);
-    }
-
-    if([settings objectForKey:@"staticColor"]){staticColor = LCPParseColorString([[settings objectForKey:@"staticColor"] stringValue], staticFallbackHex);
-    } else
-    {
-        staticColor = LCPParseColorString(staticFallbackHex, staticFallbackHex);
-    }
-
-    if([settings objectForKey:@"waveAnimationSpeed"])waveSpeed = [[settings objectForKey:@"waveAnimationSpeed"] floatValue];
-    if([settings objectForKey:@"waveOpacity"])waveOpacity = [[settings objectForKey:@"waveOpacity"] floatValue];
-    if([settings objectForKey:@"specturmAnimationSpeed"])specturmSpeed = [[settings objectForKey:@"specturmAnimationSpeed"] floatValue];
-    if([settings objectForKey:@"specturmOpacity"])specturmOpacity = [[settings objectForKey:@"specturmOpacity"] floatValue];
-    if([settings objectForKey:@"homeBarOpacity"])homeBarOpacity = [[settings objectForKey:@"homeBarOpacity"] floatValue];
-    if([settings objectForKey:@"breathingSpeed"])breathingSpeed = [[settings objectForKey:@"breathingSpeed"] floatValue];
-    if([settings objectForKey:@"fadeSpeed"])fadeSpeed = [[settings objectForKey:@"fadeSpeed"] floatValue];
-    if([settings objectForKey:@"waveDirection"])waveDirection = [[settings objectForKey:@"waveDirection"] stringValue];
-}
-
-static void PreferencesChangedCallback(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
-    refreshPrefs();
-}
-
-
-/////////////////////////////
 
 @interface MTLumaDodgePillView : UIView
 @end
@@ -96,12 +34,7 @@ static void PreferencesChangedCallback(CFNotificationCenterRef center, void *obs
 @property (nonatomic, strong) NSMutableArray *colors;
 @property (nonatomic, strong) NSTimer *timer;
 
-- (void)animateView;
-- (void)specturmView;
 - (void)waveView;
-- (void)staticView;
-- (void)fadeView;
-- (void)breathingView;
 
 @end
 
@@ -116,15 +49,7 @@ static void PreferencesChangedCallback(CFNotificationCenterRef center, void *obs
 
         if ([style isEqual:@"Wave"]) {
             self.layer.backgroundColor = [[UIColor alloc] initWithHue:_currentHueNum/360.0f saturation:1 brightness:1 alpha:1].CGColor;
-        } else if ([style isEqual:@"Spectrum"]) {
-            self.layer.backgroundColor = [[UIColor alloc] initWithHue:_currentHueNum/360.0f saturation:1 brightness:1 alpha:1].CGColor;
-        } else if ([style isEqual:@"Fade"]) {
-            self.layer.backgroundColor = firstColor.CGColor;
-        } else if ([style isEqual:@"Breathing"]) {
-            self.layer.backgroundColor = breathingColor.CGColor;
-        } else if ([style isEqual:@"Static"]) {
-            self.layer.backgroundColor = staticColor.CGColor;
-        }
+        } else { }
 
         CAGradientLayer *layer = (id)[self layer];
         [layer setStartPoint:CGPointMake(0.0, 0.5)];
@@ -161,28 +86,6 @@ static void PreferencesChangedCallback(CFNotificationCenterRef center, void *obs
                          }
                          completion:^(BOOL finished) {
                              [weakSelf animateView];
-                         }];
-    });
-}
-
-- (void)staticView {
-    self.layer.backgroundColor = staticColor.CGColor;
-}
-
-- (void)specturmView {
-    __weak ColorPillView *weakSelf = self;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [UIView animateWithDuration:specturmSpeed
-                         animations:^{
-                             weakSelf.layer.backgroundColor = [[UIColor alloc] initWithHue:weakSelf.currentHueNum/360.0f saturation:1 brightness:1 alpha:1].CGColor;
-                         }
-                         completion:^(BOOL finished) {
-                             weakSelf.currentHueNum++;
-                             if (weakSelf.currentHueNum > 360)
-                             {
-                                 weakSelf.currentHueNum = 0;
-                             }
-                             [weakSelf specturmView];
                          }];
     });
 }
@@ -253,47 +156,6 @@ static void PreferencesChangedCallback(CFNotificationCenterRef center, void *obs
     [self waveView];
 }
 
-- (void)breathingView {
-    self.colorNum++;
-    self.colorNum = self.colorNum % totalColors;
-    UIColor *newColor = breathingColor;
-    if (self.colorNum == 1) {
-        newColor = [breathingColor colorWithAlphaComponent:0];
-    }
-
-    __weak ColorPillView *weakSelf = self;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [UIView animateWithDuration:breathingSpeed
-                         animations:^{
-                             weakSelf.layer.backgroundColor = newColor.CGColor;
-                         }
-                         completion:^(BOOL finished) {
-                             [weakSelf breathingView];
-                         }];
-    });
-}
-
-- (void)fadeView {
-    self.colorNum++;
-    self.colorNum = self.colorNum % totalColors;
-    UIColor *newColor = firstColor;
-    if (self.colorNum == 1) {
-        newColor = secondColor;
-    }
-
-    __weak ColorPillView *weakSelf = self;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [UIView animateWithDuration:fadeSpeed
-                         animations:^{
-                             weakSelf.layer.backgroundColor = newColor.CGColor;
-                         }
-                         completion:^(BOOL finished) {
-                             [weakSelf fadeView];
-                         }];
-    });
-}
-
-
 @end
 
 ////////////////////////////
@@ -337,17 +199,8 @@ static void PreferencesChangedCallback(CFNotificationCenterRef center, void *obs
 
             if ([style isEqual:@"Wave"]) {
                 [colorView waveView];
-            } else if ([style isEqual:@"Spectrum"]) {
-                [colorView specturmView];
-
-            } else if ([style isEqual:@"Fade"]) {
-                [colorView fadeView];
-            } else if ([style isEqual:@"Breathing"]) {
-                [colorView breathingView];
-            } else if ([style isEqual:@"Static"]) {
-                [colorView staticView];
+            } else {
             }
-
             self.alpha = homeBarOpacity;
 
             [colorView setTranslatesAutoresizingMaskIntoConstraints:NO];
@@ -428,15 +281,6 @@ static void PreferencesChangedCallback(CFNotificationCenterRef center, void *obs
 
             if ([style isEqual:@"Wave"]) {
                 [colorView waveView];
-            } else if ([style isEqual:@"Spectrum"]) {
-                [colorView specturmView];
-            } else if ([style isEqual:@"Fade"]) {
-                [colorView fadeView];
-            } else if ([style isEqual:@"Breathing"]) {
-                [colorView breathingView];
-            } else if ([style isEqual:@"Static"]) {
-                [colorView staticView];
-            }
 
             self.alpha = homeBarOpacity;
         }
@@ -450,12 +294,3 @@ static void PreferencesChangedCallback(CFNotificationCenterRef center, void *obs
 }
 
 %end
-
-
-%ctor {
-    @autoreleasepool {
-        settings = [[NSMutableDictionary alloc] initWithContentsOfFile:[chromahomebarxPrefs stringByExpandingTildeInPath]];
-        CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback) PreferencesChangedCallback, CFSTR("com.afnanahmad.chromahomebarx.settingschanged"), NULL, CFNotificationSuspensionBehaviorCoalesce);
-        refreshPrefs();
-    }
-}
