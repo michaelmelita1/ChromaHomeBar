@@ -9,7 +9,7 @@ NSString *style = @"Wave";
 UIColor *firstColor = [UIColor blueColor];
 UIColor *secondColor = [UIColor redColor];
 
-CGFloat waveSpeed = 0.05;
+CGFloat waveSpeed = 0.02;
 CGFloat waveOpacity = 1;
 CGFloat homeBarOpacity = 1;
 NSString *waveDirection = @"l2r";
@@ -46,11 +46,7 @@ NSString *waveDirection = @"l2r";
         _colorNum = 0;
         _currentHueNum = 0;
         self.layer.backgroundColor = staticColor.CGColor;
-
-        if ([style isEqual:@"Wave"]) {
-            self.layer.backgroundColor = [[UIColor alloc] initWithHue:_currentHueNum/360.0f saturation:1 brightness:1 alpha:1].CGColor;
-        } else { }
-
+        self.layer.backgroundColor = [[UIColor alloc] initWithHue:_currentHueNum/360.0f saturation:1 brightness:1 alpha:1].CGColor;
         CAGradientLayer *layer = (id)[self layer];
         [layer setStartPoint:CGPointMake(0.0, 0.5)];
         [layer setEndPoint:CGPointMake(1.0, 0.5)];
@@ -100,12 +96,6 @@ NSString *waveDirection = @"l2r";
     // shifting all the other colors.
     CAGradientLayer *layer = (id)[self layer];
     NSMutableArray *mutableArray = self.colors;
-    //id lastColor = [mutableArray lastObject];
-    //[mutableArray removeLastObject];
-    //[mutableArray insertObject:lastColor atIndex:0];
-    //NSArray *shiftedColors = [NSArray arrayWithArray:mutableArray];
-
-    //NSArray *itemsForView = [shiftedColors subarrayWithRange: NSMakeRange( 0, shiftedColors.count / 6 )];
     NSArray *itemsForView = [mutableArray subarrayWithRange: NSMakeRange( 0, mutableArray.count / 6 )];
 
     // Update the colors on the model layer
@@ -129,16 +119,9 @@ NSString *waveDirection = @"l2r";
         dispatch_async(dispatch_get_main_queue(), ^{
             CAGradientLayer *layer = (id)[self layer];
             NSMutableArray *mutableArray = self.colors;
-            if ([waveDirection isEqualToString:@"l2r"]) {
               id lastColor = [mutableArray lastObject];
               [mutableArray removeLastObject];
               [mutableArray insertObject:lastColor atIndex:0];
-            } else if ([waveDirection isEqualToString:@"r2l"]) {
-              id firstColor = [mutableArray firstObject];
-              [mutableArray removeObjectAtIndex:0];
-              [mutableArray addObject:firstColor];
-            }
-
 
             NSArray *itemsForView = [mutableArray subarrayWithRange: NSMakeRange( 0, mutableArray.count / 6 )];
 
@@ -196,11 +179,7 @@ NSString *waveDirection = @"l2r";
             //colorView.backgroundColor = [UIColor redColor];
             colorView.colorNum = 0;
             [self addSubview:colorView];
-
-            if ([style isEqual:@"Wave"]) {
-                [colorView waveView];
-            } else {
-            }
+            [colorView waveView];
             self.alpha = homeBarOpacity;
 
             [colorView setTranslatesAutoresizingMaskIntoConstraints:NO];
@@ -216,11 +195,7 @@ NSString *waveDirection = @"l2r";
                                    views:NSDictionaryOfVariableBindings(colorView)]];
         }
 
-        // CGRect frame = colorView.frame;
-        // frame.size.height = self.frame.size.height;
-        // frame.size.width = self.frame.size.width;
-        colorView.layer.cornerRadius = self.frame.size.height / 2;
-        // colorView.frame = frame;
+        colorView.layer.cornerRadius = self.frame.size.height / 2
     }
 
 }
@@ -278,12 +253,9 @@ NSString *waveDirection = @"l2r";
             colorView.backgroundColor = [UIColor redColor];
             colorView.colorNum = 0;
             [self addSubview:colorView];
-
-            if ([style isEqual:@"Wave"]) {
                 [colorView waveView];
 
             self.alpha = homeBarOpacity;
-        }
 
         CGRect frame = colorView.frame;
         frame.size.height = self.frame.size.height;
