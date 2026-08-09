@@ -1,9 +1,9 @@
-Package: com.michaelmelita1.chromahomebar
-Name: ChromaHomeBar
-Depends: mobilesubstrate
-Version: 0.0.1
-Architecture: iphoneos-arm
-Description: ChromaHomeBarX Rootless
+Package: com.michaelmelita1.chromahomebarx
+Name: ChromaHomeBarX
+Depends: mobilesubstrate, firmware (>= 15.0)
+Version: 0.5
+Architecture: iphoneos-arm64
+Description: Razer Chroma inspired HomeBar tweak
 Maintainer: michaelmelita1
-Author: michaelmelita1
+Author: Afnad Ahmad 
 Section: Tweaks
