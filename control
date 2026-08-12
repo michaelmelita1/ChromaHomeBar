@@ -1,7 +1,7 @@
 Package: com.michaelmelita1.chromahomebarx
 Name: ChromaHomeBarX
 Depends: mobilesubstrate, firmware (>= 15.0)
-Version: 0.5
+Version: 0.6
 Architecture: iphoneos-arm64
 Description: Razer Chroma inspired HomeBar tweak
 Maintainer: michaelmelita1
